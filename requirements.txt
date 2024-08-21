@@ -1,0 +1,4 @@
+requests==2.28.1        # 用于HTTP请求，抓取百度热搜数据
+beautifulsoup4==4.11.1  # 用于解析HTML数据，提取百度热搜内容
+openai==0.27.0          # 用于调用OpenAI API，生成摘要
+pytz>=2021.1

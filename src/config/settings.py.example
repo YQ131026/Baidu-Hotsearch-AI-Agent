@@ -1,0 +1,33 @@
+import os
+
+# OpenAI API Key
+# 请将 'your_openai_api_key_here' 替换为你的实际 OpenAI API 密钥
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# OpenAI API Base URL
+# 如果使用自定义的 OpenAI 端点，请在这里替换为实际的 URL
+OPENAI_API_BASE = os.getenv("OPENAI_API_BASE", "https://api.openai.com/v1")
+
+# Baidu Hotsearch URL
+# 百度热搜的 URL
+BAIDU_HOTSEARCH_URL = "https://top.baidu.com/board?tab=realtime"
+
+# Log file path
+# 日志文件路径，请将 'your_log_file_path_here' 替换为实际的日志路径
+LOG_FILE_PATH = os.path.join(os.getcwd(), "data/logs/agent.log")
+
+# Task scheduling interval (in seconds)
+# 任务调度间隔，默认为 3600 秒（1 小时）
+SCHEDULE_INTERVAL = 3600  # 1 hour = 3600 seconds
+
+# Email settings
+# 配置邮件发送的 SMTP 服务器信息和凭据
+SMTP_SERVER = "smtp.example.com"  # 替换为你的SMTP服务器
+SMTP_PORT = 587  # 通常是587或465，具体取决于你的SMTP服务器配置
+EMAIL_SENDER = "your_email@example.com"  # 替换为你的发件人邮箱
+EMAIL_RECEIVER = ["receiver1@example.com", "receiver2@example.com"]  # 收件人邮箱列表
+EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")  # 替换为你的邮箱密码或应用专用密码
+
+# 提示用户设置环境变量
+# 注意：建议不要将敏感信息（如 API 密钥和密码）直接写在代码中，最好使用环境变量管理这些信息。
+
