@@ -1,5 +1,4 @@
 import time
-import os
 from datetime import datetime
 import pytz
 from agent.baidu_scraper import BaiduScraper
@@ -7,27 +6,16 @@ from agent.data_cleaner import DataCleaner
 from agent.openai_translation import OpenAITranslation
 from core.logging import Logger
 from core.email_sender import EmailSender
-from config.settings import BAIDU_HOTSEARCH_URL, SCHEDULE_INTERVAL, LOG_FILE_PATH
+from config.settings import BAIDU_HOTSEARCH_URL, SCHEDULE_INTERVAL
 
 class TaskScheduler:
     def __init__(self):
-        # 检查并创建日志目录
-        self.ensure_log_directory_exists(LOG_FILE_PATH)
-        
         # 初始化各个模块
         self.baidu_scraper = BaiduScraper(BAIDU_HOTSEARCH_URL)
         self.cleaner = DataCleaner()
         self.translator = OpenAITranslation()
         self.logger = Logger()
         self.email_sender = EmailSender()
-
-    def ensure_log_directory_exists(self, log_file_path):
-        log_dir = os.path.dirname(log_file_path)
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
-            print(f"Log directory created: {log_dir}")
-        else:
-            print(f"Log directory already exists: {log_dir}")
 
     def schedule_task(self):
         # 定期调度任务
@@ -38,9 +26,9 @@ class TaskScheduler:
     def run_task(self):
         print("========== Task Execution Started ==========")
         try:
-            # 获取中国标准时间的当前日期
-            current_date = self.get_china_date()
-            print(f"[Step 0] Current China Date: {current_date}")
+            # 获取中国标准时间的当前日期和时间
+            current_datetime = self.get_china_datetime()
+            print(f"[Step 0] Current China DateTime: {current_datetime}")
 
             # 1. 抓取百度热搜数据
             print("[Step 1] Fetching Baidu hotsearch data...")
@@ -68,7 +56,7 @@ class TaskScheduler:
                 print(f"{idx}. {item['chinese']}\n   {item['english']}")
 
             # 6. 格式化邮件内容
-            formatted_content = self.format_email_content(current_date, translated_baidu_content)
+            formatted_content = self.format_email_content(current_datetime, translated_baidu_content)
             print("[Step 6] Content formatted successfully.")
 
             # 7. 记录日志
@@ -77,8 +65,9 @@ class TaskScheduler:
             print("[Step 7] Translation logged.")
 
             # 8. 发送邮件，内容为翻译后的内容
-            print("[Step 8] Sending email with translated content...")
-            self.email_sender.send_email("Baidu Hotsearch Bilingual Translation", formatted_content)
+            email_subject = f"Baidu Hotsearch Bilingual Translation - {current_datetime}"
+            print(f"[Step 8] Sending email with subject: {email_subject}...")
+            self.email_sender.send_email(email_subject, formatted_content)
             print("[Step 8] Email sent successfully.")
         except Exception as e:
             # 如果有错误发生，记录错误信息并输出到控制台
@@ -87,15 +76,15 @@ class TaskScheduler:
             self.logger.log(error_message)
         print("========== Task Execution Completed ==========\n")
 
-    def get_china_date(self):
-        # 获取中国标准时间的当前日期，格式为 "今日X年X月X日"
+    def get_china_datetime(self):
+        # 获取中国标准时间的当前日期和时间，格式为 "2024年08月21日14时"
         china_tz = pytz.timezone('Asia/Shanghai')
-        china_date = datetime.now(china_tz).strftime('今日%Y年%m月%d日')
-        return china_date
+        china_datetime = datetime.now(china_tz).strftime('%Y年%m月%d日%H时')
+        return china_datetime
 
-    def format_email_content(self, current_date, translated_baidu_content):
+    def format_email_content(self, current_datetime, translated_baidu_content):
         formatted = f"### Baidu Hotsearch Bilingual Translation\n\n"
-        formatted += f"**China Date:** {current_date}\n\n"
+        formatted += f"**China DateTime:** {current_datetime}\n\n"
         
         formatted += f"**Baidu Hotsearch:**\n"
         for idx, item in enumerate(translated_baidu_content, 1):
